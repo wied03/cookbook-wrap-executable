@@ -1,8 +1,12 @@
-include_recipe 'bsw_gpg::default'
-
 chef_gem 'with'
 require 'with'
 
-include_recipe 'fake::from_string'
-include_recipe 'fake::from_key_server'
-include_recipe 'fake::from_chef_vault'
+bsw_wrap_executable_install '/usr/bin/apt-get'
+
+bsw_wrap_executable_install '/usr/bin/debconf' do
+  template_source_file 'debconf-custom-wrapper.sh.erb'
+end
+
+bsw_wrap_executable_install '/usr/bin/diff' do
+  cookbook 'fake2'
+end

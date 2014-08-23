@@ -2,79 +2,32 @@
 
 require_relative 'spec_helper'
 
-describe 'Key contents LWRP - Root' do
-  describe command('sudo -i gpg2 --list-keys') do
-    it {
-      should return_stdout /.*pub   4096R\/B22D2CD5.*/
-    }
+describe 'Default target name/source works' do
+  describe command('apt-get --version') do
+    it { should return_stdout /apt 1\.0\.1ubuntu2 for amd64 compiled on Jun 13 2014 17:40:05.*/ }
   end
 
-  describe command('sudo -i gpg2 --export-ownertrust') do
-    it { should return_stdout /.*C26E1EFE:6:$/ }
-  end
-
-  describe command('sudo -i gpg2 --list-secret-keys') do
-    it { should return_stdout /.*sec   2048R\/C26E1EFE.*/ }
+  describe file('/tmp/RAN_APT_GET_JUST_NOW') do
+    it { should be_file }
   end
 end
 
-describe 'Key Contents LWRP - Joe - Public Key - Non-default Keyring' do
-  describe command('sudo -u joe -i gpg2 --list-keys --no-default-keyring --keyring stuff.gpg') do
-    it { should return_stdout /.*pub   4096R\/B22D2CD5.*/ }
+describe 'Custom source name works' do
+  describe command('debconf --help') do
+    it { should return_stdout /Usage: debconf [options] command [args].*/ }
   end
 
-  # non default keyring, owner trusts are 1 per user
-  describe command('sudo -u joe -i gpg2 --export-ownertrust') do
-    it { should_not return_stdout /.*B22D2CD5:6:$/ }
-    it { should_not return_stdout /.*C26E1EFE:6:$/ }
+  describe file('/tmp/RAN_DEBCONF_GET_JUST_NOW') do
+    it { should be_file }
   end
 end
 
-describe 'Key Contents LWRP - Joe - Secret Key - Non-default Keyring' do
-  describe command('sudo -u joe -i gpg2 --list-secret-keys --no-default-keyring --secret-keyring stuff_secret.gpg') do
-    it { should return_stdout /.*sec   2048R\/C26E1EFE.*/ }
-  end
-end
-
-describe 'Key Contents LWRP - Bob - Key server' do
-  describe command('sudo -u bob -i gpg2 --list-keys') do
-    it { should return_stdout /.*pub   4096R\/AC40B2F7.*/ }
+describe 'Custom cookbook works' do
+  describe command('diff --version') do
+    it { should return_stdout /diff \(GNU diffutils\) 3\.3.*/ }
   end
 
-  describe command('sudo -u bob -i gpg2 --export-ownertrust') do
-    it { should_not return_stdout /.*AC40B2F7:6:$/ }
-  end
-end
-
-describe 'Key Contents LWRP - Seymour - Secret Key - Non-default Keyring' do
-  describe command('sudo -u seymour -i gpg2 --list-secret-keys --no-default-keyring --secret-keyring stuff_secret.gpg') do
-    it { should return_stdout /.*sec   2048R\/C26E1EFE.*/ }
-  end
-
-  # we forced a trust here
-  describe command('sudo -u seymour -i gpg2 --export-ownertrust') do
-    it { should return_stdout /.*C26E1EFE:6:$/ }
-  end
-end
-
-describe 'Key Contents LWRP - John - Normal secret key + external public key' do
-  describe command('sudo -u john -i gpg2 --export-ownertrust') do
-    it { should return_stdout /.*C26E1EFE:6:$/ }
-  end
-
-  describe command('sudo -u john -i gpg2 --list-secret-keys') do
-    it { should return_stdout /.*sec   2048R\/C26E1EFE.*/ }
-  end
-
-  describe command('sudo -u john -i gpg2 --list-keys --no-default-keyring --keyring stuff.gpg') do
-    it {
-      should return_stdout /.*pub   4096R\/B22D2CD5.*/
-    }
-  end
-end
-
-describe 'Key Contents LWRP - Walt - Chef vault provided key' do
-  describe command('sudo -u walt -i gpg2 --list-secret-keys') do
-    it { should return_stdout /.*sec   2048R\/C26E1EFE.*/ }
+  describe file('/tmp/RAN_DIFF_GET_JUST_NOW') do
+    it { should be_file }
   end
 end

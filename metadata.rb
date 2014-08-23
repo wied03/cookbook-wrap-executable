@@ -1,5 +1,5 @@
 # Encoding: utf-8
-name 'bsw-wrap-executable'
+name 'bsw_wrap_executable'
 maintainer 'BSW Technology Consulting LLC'
 maintainer_email 'support@bswtechconsulting.com'
 license 'BSD 2 Clause License'
