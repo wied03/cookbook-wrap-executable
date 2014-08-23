@@ -2,7 +2,18 @@
 
 require_relative 'spec_helper'
 
+def clear_tmp_files
+  Dir.glob '/tmp/RAN_*' do |f|
+    puts "Removing #{f} before test"
+    FileUtils.rm_rf f
+  end
+end
+
 describe 'Default target name/source works' do
+  before(:all) do
+    clear_tmp_files
+  end
+
   describe command('apt-get --version') do
     it { should return_stdout /apt 1\.0\.1ubuntu2.*/ }
   end
@@ -13,6 +24,10 @@ describe 'Default target name/source works' do
 end
 
 describe 'Custom source name works' do
+  before(:all) do
+    clear_tmp_files
+  end
+
   describe command('debconf --help') do
     it { should return_stdout /Usage: debconf \[options\] command \[args\].*/ }
   end
@@ -23,6 +38,10 @@ describe 'Custom source name works' do
 end
 
 describe 'Custom cookbook works' do
+  before(:all) do
+    clear_tmp_files
+  end
+  
   describe command('diff --version') do
     it { should return_stdout /diff \(GNU diffutils\) 3\.3.*/ }
   end
