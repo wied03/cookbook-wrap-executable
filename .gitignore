@@ -1,0 +1,22 @@
+*~
+*#
+.#*
+\#*#
+.*.sw[a-z]
+*.un~
+pkg/
+.idea
+test/unit/spec/gen_cookbooks/*
+
+# Berkshelf
+.vagrant
+/cookbooks
+Berksfile.lock
+
+# Bundler
+bin/*
+.bundle/*
+
+.coverage/*
+.kitchen/
+.kitchen.local.yml
