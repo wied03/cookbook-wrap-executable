@@ -21,6 +21,14 @@ describe 'Default target name/source works' do
   describe file('/tmp/RAN_APT_GET_JUST_NOW') do
     it { should be_file }
   end
+
+  describe file('/tmp/replaced_apt_wrapper_once') do
+    it { should be_file }
+  end
+
+  describe file('/tmp/replaced_apt_wrapper_twice') do
+    it { should_not be_file }
+  end
 end
 
 describe 'Custom source name works' do
@@ -41,7 +49,7 @@ describe 'Custom cookbook works' do
   before(:all) do
     clear_tmp_files
   end
-  
+
   describe command('diff --version') do
     it { should return_stdout /diff \(GNU diffutils\) 3\.3.*/ }
   end
