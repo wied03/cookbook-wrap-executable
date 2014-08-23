@@ -4,7 +4,7 @@ require_relative 'spec_helper'
 
 describe 'Default target name/source works' do
   describe command('apt-get --version') do
-    it { should return_stdout /apt 1\.0\.1ubuntu2 for amd64 compiled on Jun 13 2014 17:40:05.*/ }
+    it { should return_stdout /apt 1\.0\.1ubuntu2.*/ }
   end
 
   describe file('/tmp/RAN_APT_GET_JUST_NOW') do
@@ -14,7 +14,7 @@ end
 
 describe 'Custom source name works' do
   describe command('debconf --help') do
-    it { should return_stdout /Usage: debconf [options] command [args].*/ }
+    it { should return_stdout /Usage: debconf \[options\] command \[args\].*/ }
   end
 
   describe file('/tmp/RAN_DEBCONF_GET_JUST_NOW') do
