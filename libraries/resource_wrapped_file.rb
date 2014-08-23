@@ -7,7 +7,7 @@ class Chef
       attribute :cookbook, :kind_of => String
 
       self.resource_name = :bsw_wrap_executable_install
-      self.default_action = :install
+      self.default_action :install
     end
   end
 end
