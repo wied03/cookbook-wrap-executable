@@ -1,6 +1,6 @@
-gpg Cookbook
+wrap-executable Cookbook
 ============
-LWRP focused cookbook that helps load public or private keys into your GPG keyring from either a string, a cookbook file, or a Chef vault item.  The cookbook will check to see if the key fingerprint and user name already exist in the key ring before converging.  The resources automatically choose secret vs. public keyrings based on the header of the base64 key contents.
+LWRP focused cookbook that creates a wrapper executable around a file you specify
 
 
 Requirements
@@ -15,106 +15,7 @@ None, LWRP focused
 Usage
 -----
 
-Include the bsw_gpg::default recipe in your cookbook, which will install the gnupg2 package
-
-#### Install from a string
-
-```ruby
-bsw_gpg_load_key_from_string 'a string key' do
-    key_contents '-----BEGIN PGP PUBLIC KEY BLOCK----- (rest of key here'
-    for_user 'joe' # The user you want to install the key to
-end
-```
-
-#### Install from a cookbook file
-
-```ruby
-public_key_in_base_64 = cookbook_file_contents 'something.pub','mycookbookname'
-bsw_gpg_load_key_from_string 'a cookbook key' do
-    key_contents public_key_in_base_64
-    for_user 'joe' # The user you want to install the key to
-end
-```
-
-#### Install from a Chef vault item
-
-```ruby
-bsw_gpg_load_key_from_chef_vault 'a chef vault key' do
-    data_bag 'thedatabag'
-    item 'the_item'
-    json_key 'json_key' # Expects to find a hash key with the base64 key contents in it            
-    for_user 'joe' # The user you want to install the key to
-end
-```
-
-#### Install from a key server
-
-```ruby
-bsw_gpg_load_key_from_key_server 'some key' do
-  key_server 'keyserver.ubuntu.com'
-  key_id '561F9B9CAC40B2F7'
-  for_user 'root'
-end
-```
-
-#### Use a non-default keyring
-
-You can use this on any of the resources
-
-```ruby
-bsw_gpg_load_key_from_key_server 'some key' do
-  key_server 'keyserver.ubuntu.com'
-  key_id '561F9B9CAC40B2F7'
-  for_user 'root'
-  keyring_file 'stuff_secret.gpg'
-end
-```
-
-#### Force the trust-db rebuild
-
-You can use this on any of the resources.  By default, the LWRP lets gpg2 update the trustdb whenever it's executing commands on the default keyring.  When it's a custom keyring, in order to avoid gpg2 complaining about not being able to find keys you trust, the LWRP will add --no-auto-check-trustdb.  If you want to override this behavior, you can do so like below
-
-```ruby
-# TrustDB check would normally be disabled
-bsw_gpg_load_key_from_key_server 'some key' do
-  key_server 'keyserver.ubuntu.com'
-  key_id '561F9B9CAC40B2F7'
-  for_user 'root'
-  keyring_file 'stuff.gpg'
-  disable_trust_db_check false
-end
-# TrustDB check would normally be enabled
-bsw_gpg_load_key_from_key_server 'some key' do
-  key_server 'keyserver.ubuntu.com'
-  key_id '561F9B9CAC40B2F7'
-  for_user 'root'
-  disable_trust_db_check true
-end
-```
-
-#### Force trusting (or not) of newly imported keys
-
-By default, after importing the key, if a private key is being imported into the default keyring, these LWRPs runs the equivalent of echo "<keyFingerprint>:6:\n" | gpg2 --import-ownertrust.  If you wish to force the trust to be imported (or not imported) regardless of the default, you can do something like this.
-
-```ruby
-# Example 1
-bsw_gpg_load_key_from_chef_vault 'a chef vault key' do
-    data_bag 'thedatabag'
-    item 'the_item'
-    json_key 'json_key' # Expects to find a hash key with the base64 key contents in it            
-    for_user 'joe' # The user you want to install the key to
-    force_import_owner_trust false # Will prevent an import that otherwise would have occurred
-end
-# Example 1
-bsw_gpg_load_key_from_chef_vault 'a chef vault key' do
-  data_bag 'thedatabag'
-  item 'the_item'
-  json_key 'json_key' # Expects to find a hash key with the base64 key contents in it            
-  for_user 'joe' # The user you want to install the key to
-  keyring_file 'stuff_secret.gpg'
-  force_import_owner_trust true # Will force an import that otherwise would NOT have occurred  
-end
-```
+TBD, for now, see the test kitchen examples
 
 Contributing
 ------------
