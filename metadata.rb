@@ -1,9 +1,9 @@
 # Encoding: utf-8
-name 'bsw_gpg'
+name 'bsw-wrap-executable'
 maintainer 'BSW Technology Consulting LLC'
 maintainer_email 'support@bswtechconsulting.com'
 license 'BSD 2 Clause License'
-description 'Installs/Configures gpg using an LWRP based approach'
+description "'Replaces' an executable by replacing it with a wrapper script of your choosing"
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version '0.1.4'
+version '0.1.0'
 supports 'ubuntu', '14.04'
