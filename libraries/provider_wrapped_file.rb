@@ -12,6 +12,7 @@ class Chef
           if template.updated_by_last_action?
             converge_by "Replacing #{@new_resource.target_file} with wrapper" do
               ::FileUtils.mv @new_resource.target_file, wrapped_file
+              ::FileUtils.cp template.path, @new_resource.target_file
             end
           end
         end
@@ -27,7 +28,7 @@ class Chef
           temp.run_action :create
           yield temp
         ensure
-          ::FileUtils.mv temporary_file_path, @new_resource.target_file
+          ::FileUtils.rm temporary_file_path
         end
       end
 
@@ -40,6 +41,7 @@ class Chef
         parent_resource = @new_resource
         template_source = parent_resource.source || base_target_file
         template temporary_file_path do
+          sensitive true
           cookbook parent_resource.cookbook if parent_resource.cookbook
           source template_source
           variables :wrapped_file => wrapped_file_copy
