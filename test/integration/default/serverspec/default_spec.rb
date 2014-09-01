@@ -58,3 +58,17 @@ describe 'Custom cookbook works' do
     it { should be_file }
   end
 end
+
+describe 'Notification TO the wrapper works, even after the first run was replaced' do
+  before(:all) do
+    clear_tmp_files
+  end
+
+  describe command('gpg --version') do
+    it { should return_stdout /gpg \(GnuPG\) 1\..*/ }
+  end
+
+  describe file('/tmp/RAN_GPG_JUST_NOW') do
+    it { should be_file }
+  end
+end

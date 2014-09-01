@@ -23,3 +23,18 @@ bsw_wrap_executable_install 'again' do
   target_file '/usr/bin/apt-get'
   notifies :touch, 'file[/tmp/replaced_apt_wrapper_twice]', :immediately
 end
+
+bsw_wrap_executable_install '/usr/bin/gpg'
+
+bsw_wrap_executable_install 'gpg_again' do
+  action :nothing
+  target_file '/usr/bin/gpg'
+end
+
+# Simulate something switching it back
+ruby_block 'wreck stuff' do
+  block do
+    ::FileUtils.mv '/usr/bin/gpg-wrapped', '/usr/bin/gpg'
+  end
+  notifies :install, 'bsw_wrap_executable_install[gpg_again]', :immediately
+end
