@@ -8,11 +8,15 @@ class Chef
       use_inline_resources
 
       def action_install
-        with_temporary_resource do |template|
-          if template.updated_by_last_action?
-            converge_by "Replacing #{@new_resource.target_file} with wrapper" do
-              ::FileUtils.mv @new_resource.target_file, wrapped_file
-              ::FileUtils.cp template.path, @new_resource.target_file
+        current = get_current_contents
+        draft = get_draft_contents
+        if current != draft
+          converge_by "Replacing #{@new_resource.target_file} with wrapper" do
+            wrapped = get_wrapped_file_name
+            ::FileUtils.mv @new_resource.target_file, wrapped
+            existing_permissions = ::File.stat(wrapped).mode
+            ::File.open @new_resource.target_file, 'w', existing_permissions do |file|
+              file << draft
             end
           end
         end
@@ -20,40 +24,36 @@ class Chef
 
       private
 
-      def with_temporary_resource
-        temporary_file_path = temporary_file_name
-        ::FileUtils.cp @new_resource.target_file, temporary_file_path
-        begin
-          temp = temp_resource temporary_file_path
-          temp.run_action :create
-          yield temp
-        ensure
-          ::FileUtils.rm temporary_file_path
+      def get_template_file_contents(source, cookbook_name)
+        ::File.read(get_template_location(source, cookbook_name))
+      end
+
+      def get_template_location(source, cookbook_name)
+        cookbook = run_context.cookbook_collection[cookbook_name]
+        cookbook.preferred_filename_on_disk_location(node, :templates, source)
+      end
+
+      def get_draft_contents
+        cookbook = @new_resource.cookbook || @new_resource.cookbook_name
+        template_contents = get_template_file_contents get_source_file_name, cookbook
+        # used in the template
+        @wrapped_file = get_wrapped_file_name
+        ERB.new(template_contents).result(binding)
+      end
+
+      def get_current_contents
+        ::File.read(@new_resource.target_file)
+      end
+
+      def get_source_file_name
+        candidate = @new_resource.source || ::File.basename(@new_resource.target_file)
+        if ::File.extname(candidate) != '.erb'
+          candidate += '.erb'
         end
+        candidate
       end
 
-      def temporary_file_name
-        Dir::Tmpname.create([::File.basename(@new_resource.target_file),'.tmp']) {}
-      end
-
-      def temp_resource(temporary_file_path)
-        wrapped_file_copy = wrapped_file
-        parent_resource = @new_resource
-        template_source = parent_resource.source || base_target_file
-        template temporary_file_path do
-          sensitive true
-          cookbook parent_resource.cookbook if parent_resource.cookbook
-          source template_source
-          variables :wrapped_file => wrapped_file_copy
-        end
-      end
-
-      def base_target_file
-        filename = ::File.basename @new_resource.target_file
-        "#{filename}.erb"
-      end
-
-      def wrapped_file
+      def get_wrapped_file_name
         base_file = ::File.basename(@new_resource.target_file)
         wrapper_base = "#{base_file}-wrapped"
         ::File.join(::File.dirname(@new_resource.target_file), wrapper_base)
